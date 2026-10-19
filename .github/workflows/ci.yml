@@ -27,3 +27,24 @@ jobs:
         with:
           name: dist
           path: dist
+
+  deploy:
+    needs: build
+    # 仅 main 分支的推送触发上线；PR 只做校验
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: 部署到 Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || 'REDACTED_CF_ACCOUNT_ID' }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: npx wrangler@latest pages deploy dist --project-name money-site --branch main

@@ -75,24 +75,32 @@ node scripts/generate-content.mjs --count=5 --topic=ai-tools
 **线上（GitHub Actions）**：仓库 `Settings → Secrets and variables → Actions` 添加
 `LLM_API_KEY`（必填）、`LLM_BASE_URL`、`LLM_MODEL`、`ALERT_WEBHOOK`（可选，失败告警）。
 
-## 三、部署到 Cloudflare Pages
+## 三、部署到 Cloudflare Pages（已上线）
 
-1. 推送代码到 GitHub（见下方命令）。
-2. Cloudflare Dashboard → **Workers & Pages → Create → Pages → Connect to Git**，选中本仓库。
-3. 构建配置：
+**线上信息**
 
-   | 项目 | 值 |
-   | --- | --- |
-   | Framework preset | Astro |
-   | Build command | `npm run build` |
-   | Build output directory | `dist` |
-   | Node version | 环境变量 `NODE_VERSION` = `22` |
+| 项目 | 值 |
+| --- | --- |
+| 生产域名 | https://loc.opengear.org |
+| Pages 项目 | `money-site` |
+| 默认地址 | https://money-site-4g0.pages.dev |
+| Cloudflare 账户 | `REDACTED_CF_ACCOUNT_ID` |
 
-4. 绑定自定义域 `loc.opengear.org`：项目 → **Custom domains → Set up a custom domain**，填入域名即可。
-   `opengear.org` 的 NS 已托管在 Cloudflare，系统会自动写入 CNAME 记录并签发证书，无需手动改解析。
-   （域名已固化在 `site.config.mjs` 的 `url` 字段，canonical、sitemap、RSS 都会指向它。）
+部署方式为 **GitHub Actions + wrangler 直接上传**：push 到 `main` 后，CI 自动构建 → SEO 自检 → 部署上线。
+DNS 由 Cloudflare 自动管理（`loc.opengear.org` CNAME 到 `money-site-4g0.pages.dev`，已开启代理与自动证书）。
 
-之后每次 push，Pages 会自动重新构建部署；每日定时任务生成内容并提交后，同样会自动上线。
+**自动化部署依赖的 Secrets**（已配置，换机器时需重新填写）：
+`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`。
+
+**手动部署**（本地也想发一次时用）：
+
+```bash
+export CLOUDFLARE_API_TOKEN=xxx
+npm run build
+npx wrangler@latest pages deploy dist --project-name money-site --branch main
+```
+
+（域名已固化在 `site.config.mjs` 的 `url` 字段，canonical、sitemap、RSS 全部指向它。）
 
 ## 四、收款：接入 AdSense
 
