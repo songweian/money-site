@@ -181,8 +181,11 @@ th {
 .site-header__inner {
   display: flex;
   align-items: center;
-  gap: 24px;
-  height: 62px;
+  gap: 16px 24px;
+  min-height: 62px;
+  height: auto;
+  padding: 8px 0;
+  flex-wrap: wrap;
 }
 .brand {
   display: flex;
@@ -192,6 +195,8 @@ th {
   font-size: 1.05rem;
   color: var(--c-text);
   letter-spacing: -0.02em;
+  white-space: nowrap;
+  flex: none;
 }
 .brand:hover {
   text-decoration: none;
@@ -211,7 +216,7 @@ th {
 .nav {
   display: flex;
   gap: 4px;
-  margin-left: auto;
+  margin-left: 12px;
   flex-wrap: wrap;
 }
 .nav a {
@@ -229,7 +234,7 @@ th {
 .lang-switch {
   display: inline-flex;
   align-items: center;
-  margin-left: 6px;
+  margin-left: auto;
   border: 1px solid var(--c-border);
   border-radius: 999px;
   overflow: hidden;
@@ -294,7 +299,7 @@ html.lang-pending body {
 }
 
 .card {
-  background: #fff;
+  background: var(--c-bg);
   border: 1px solid var(--c-border);
   border-radius: var(--radius-m);
   padding: 20px;
@@ -579,9 +584,11 @@ html.lang-pending body {
     font-size: 16px;
   }
   .site-header__inner {
-    height: auto;
     padding: 10px 0;
-    flex-wrap: wrap;
+  }
+  .nav {
+    width: 100%;
+    margin-left: 0;
   }
   .hero {
     padding: 36px 0 28px;

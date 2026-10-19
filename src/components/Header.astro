@@ -29,6 +29,10 @@ const items = [
       <span class="brand__mark" aria-hidden="true">AI</span>
       <span data-en={ui.en.siteTitle}>{lang === 'en' ? t.siteTitle : site.title}</span>
     </a>
+    <div class="lang-switch" role="group" aria-label={t.language}>
+      <a href={withLocale('zh', path)} data-set-lang="zh" aria-current={lang === 'zh' ? 'true' : undefined} lang="zh">中文</a>
+      <a href={withLocale('en', path)} data-set-lang="en" aria-current={lang === 'en' ? 'true' : undefined} lang="en">EN</a>
+    </div>
     <nav class="nav" aria-label={lang === 'en' ? 'Main' : '主导航'}>
       {
         items.map((item) => (
@@ -42,10 +46,6 @@ const items = [
           </a>
         ))
       }
-      <div class="lang-switch" role="group" aria-label={t.language}>
-        <a href={withLocale('zh', path)} data-set-lang="zh" aria-current={lang === 'zh' ? 'true' : undefined} lang="zh">中文</a>
-        <a href={withLocale('en', path)} data-set-lang="en" aria-current={lang === 'en' ? 'true' : undefined} lang="en">EN</a>
-      </div>
     </nav>
   </div>
 </header>

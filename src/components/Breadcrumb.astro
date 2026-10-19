@@ -14,7 +14,7 @@ const { items, lang = 'zh' } = Astro.props;
 const all = [{ href: withLocale(lang, '/'), label: ui[lang].home }, ...items];
 ---
 
-<nav class="breadcrumb" aria-label="面包屑导航">
+<nav class="breadcrumb" aria-label={lang === 'en' ? 'Breadcrumb' : '面包屑导航'}>
   <ol style="list-style:none;display:flex;gap:8px;flex-wrap:wrap;margin:0;padding:0">
     {
       all.map((c, i) => (
