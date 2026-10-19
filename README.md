@@ -88,8 +88,9 @@ node scripts/generate-content.mjs --count=5 --topic=ai-tools
    | Build output directory | `dist` |
    | Node version | 环境变量 `NODE_VERSION` = `22` |
 
-4. 部署完成后把 `site.config.mjs` 的 `url` 改成真实域名（`*.pages.dev` 或自定义域）。
-5. 自定义域：Pages 项目 → Custom domains → 按指引接入（域名 NS 托管到 Cloudflare 最省事）。
+4. 绑定自定义域 `loc.opengear.org`：项目 → **Custom domains → Set up a custom domain**，填入域名即可。
+   `opengear.org` 的 NS 已托管在 Cloudflare，系统会自动写入 CNAME 记录并签发证书，无需手动改解析。
+   （域名已固化在 `site.config.mjs` 的 `url` 字段，canonical、sitemap、RSS 都会指向它。）
 
 之后每次 push，Pages 会自动重新构建部署；每日定时任务生成内容并提交后，同样会自动上线。
 

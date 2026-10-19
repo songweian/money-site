@@ -9,8 +9,8 @@ export const site = {
   tagline: '用 AI 工具把工作效率翻倍的实战指南',
   description:
     'AI 效能实验室专注评测 AI 工具、自动化工作流与效率提升方法，每天更新真实可落地的实操教程、横向对比与避坑指南。',
-  // 部署后改成真实域名（Cloudflare Pages 会给出 *.pages.dev，绑定自定义域后替换）
-  url: 'https://money-site.pages.dev',
+  // 生产域名（Cloudflare Pages 自定义域）
+  url: 'https://loc.opengear.org',
   lang: 'zh-CN',
   locale: 'zh_CN',
   timezone: 'Asia/Shanghai',
