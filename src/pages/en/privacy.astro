@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { site } from '../../../site.config.mjs';
+import { withLocale } from '../../i18n';
+
+const domain = new URL(site.url).hostname;
+const description =
+  'Privacy policy for AI Efficiency Lab: what we collect, how cookies, Cloudflare, and ads work, and how you can limit personalized advertising.';
+---
+
+<BaseLayout lang="en" title="Privacy policy" description={description}>
+  <div class="container prose">
+    <Breadcrumb lang="en" items={[{ label: 'Privacy policy' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>Privacy policy</h1>
+      <p>Last updated: {new Date().toLocaleDateString('en-US', { timeZone: site.timezone })}</p>
+
+      <h2>Information we collect</h2>
+      <p>
+        Visiting {domain} does not require an account. We may collect aggregated visit data, such as pages viewed,
+        referrers, and approximate region, to improve the guides.
+      </p>
+
+      <h2>Cookies and third parties</h2>
+      <p>These services may set cookies:</p>
+      <ul>
+        <li><strong>Cloudflare</strong>: delivery and security for the site.</li>
+        {
+          site.ads.enabled && (
+            <li>
+              <strong>Google AdSense</strong>: advertising. Google and its partners may use cookies to show ads based
+              on visits to this and other sites. You can turn off personalized ads in
+              <a href="https://www.google.com/settings/ads" rel="nofollow noopener" target="_blank">Google’s ad settings</a>.
+            </li>
+          )
+        }
+      </ul>
+      <p>You can block cookies in your browser. Some features may stop working.</p>
+
+      <h2>Logs</h2>
+      <p>
+        Like most sites, the server logs IP address, browser type, time, and referrer so we can debug outages.
+        Those logs are not tied to an account, because there is no account.
+      </p>
+
+      <h2>Links</h2>
+      <p>Pages link to other sites. Their privacy practices are their own.</p>
+
+      <h2>Changes</h2>
+      <p>When this policy changes, the new version is posted on this page.</p>
+
+      <h2>Contact</h2>
+      <p>Questions: use the <a href={withLocale('en', '/contact/')}>contact page</a>.</p>
+    </article>
+  </div>
+</BaseLayout>

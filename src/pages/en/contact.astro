@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { withLocale } from '../../i18n';
+
+const description =
+  'Contact AI Efficiency Lab about a correction, a topic you want covered, or a commercial inquiry. Reviews are not shaped by sponsorship.';
+---
+
+<BaseLayout lang="en" title="Contact" description={description}>
+  <div class="container prose">
+    <Breadcrumb lang="en" items={[{ label: 'Contact' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>Contact</h1>
+      <p>Write to us about a factual error, a topic you want explained, or a business inquiry.</p>
+      <ul>
+        <li><strong>Corrections</strong>: include the article link and what is wrong. We update the page after checking.</li>
+        <li><strong>Topic ideas</strong>: tell us the task you are trying to finish, not just a product name.</li>
+        <li><strong>Partnerships</strong>: describe the format. Sponsored mentions will be labeled, and reviews stay independent.</li>
+      </ul>
+      <div class="callout">
+        <strong>Note:</strong> an email address or form appears here after it is added in the site settings.
+      </div>
+      <p><a href={withLocale('en', '/privacy/')}>Privacy policy</a></p>
+    </article>
+  </div>
+</BaseLayout>

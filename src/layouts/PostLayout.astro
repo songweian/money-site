@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import AdSlot from '../components/AdSlot.astro';
 import { site } from '../../site.config.mjs';
+import { topics, ui, withLocale, type Lang } from '../i18n';
 
 interface Heading {
   depth: number;
@@ -25,14 +26,16 @@ interface Props {
   headings: Heading[];
   slug: string;
   related: { title: string; href: string }[];
+  lang?: Lang;
 }
-const { frontmatter, headings, slug, related } = Astro.props;
+const { frontmatter, headings, slug, related, lang = 'zh' } = Astro.props;
+const t = ui[lang];
 
-const topicInfo = site.niche.topics.find((t) => t.slug === frontmatter.topic);
+const topicInfo = lang === 'en' ? topics.en[frontmatter.topic] : topics.zh[frontmatter.topic];
 const toc = headings.filter((h) => h.depth === 2);
-const postUrl = new URL(`/posts/${slug}/`, site.url).toString();
+const postUrl = new URL(withLocale(lang, `/posts/${slug}/`), site.url).toString();
 const fmt = (d: Date) =>
-  d.toLocaleDateString('zh-CN', {
+  d.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -47,12 +50,12 @@ const articleSchema = {
   image: frontmatter.heroImage ? new URL(frontmatter.heroImage, site.url).toString() : undefined,
   datePublished: frontmatter.pubDate.toISOString(),
   dateModified: (frontmatter.updatedDate ?? frontmatter.pubDate).toISOString(),
-  inLanguage: site.lang,
+  inLanguage: lang === 'en' ? 'en' : site.lang,
   mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
   author: { '@type': 'Organization', name: frontmatter.author ?? site.author.name, url: site.url },
   publisher: {
     '@type': 'Organization',
-    name: site.title,
+    name: lang === 'en' ? t.siteTitle : site.title,
     url: site.url,
     logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', site.url).toString() },
   },
@@ -73,14 +76,15 @@ const faqSchema =
     : null;
 ---
 
-<BaseLayout title={frontmatter.title} description={frontmatter.description} ogImage={frontmatter.heroImage}>
+<BaseLayout title={frontmatter.title} description={frontmatter.description} ogImage={frontmatter.heroImage} lang={lang}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} is:inline />
   {faqSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} is:inline />}
 
   <div class="container prose">
     <Breadcrumb
+      lang={lang}
       items={[
-        { href: `/topics/${frontmatter.topic}/`, label: topicInfo?.name ?? frontmatter.topic },
+        { href: withLocale(lang, `/topics/${frontmatter.topic}/`), label: topicInfo?.name ?? frontmatter.topic },
         { label: frontmatter.title },
       ]}
     />
@@ -92,18 +96,18 @@ const faqSchema =
       </p>
       <div class="post-meta">
         <span>{frontmatter.author ?? site.author.name}</span>
-        <time datetime={frontmatter.pubDate.toISOString()}>发布于 {fmt(frontmatter.pubDate)}</time>
+        <time datetime={frontmatter.pubDate.toISOString()}>{t.publishedOn} {fmt(frontmatter.pubDate)}</time>
         {frontmatter.updatedDate && (
-          <time datetime={frontmatter.updatedDate.toISOString()}>更新于 {fmt(frontmatter.updatedDate)}</time>
+          <time datetime={frontmatter.updatedDate.toISOString()}>{t.updatedOn} {fmt(frontmatter.updatedDate)}</time>
         )}
-        {topicInfo && <a href={`/topics/${frontmatter.topic}/`}>{topicInfo.name}</a>}
+        {topicInfo && <a href={withLocale(lang, `/topics/${frontmatter.topic}/`)}>{topicInfo.name}</a>}
       </div>
 
-      <AdSlot slot="header" label="广告" height={90} />
+      <AdSlot slot="header" label={t.ad} height={90} />
 
       {toc.length >= 3 && (
-        <nav class="toc" aria-label="目录">
-          <p class="toc__title">本文目录</p>
+        <nav class="toc" aria-label={t.toc}>
+          <p class="toc__title">{t.toc}</p>
           <ol>
             {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
           </ol>
@@ -120,12 +124,12 @@ const faqSchema =
         </p>
       )}
 
-      <AdSlot slot="footer" label="广告" height={100} />
+      <AdSlot slot="footer" label={t.ad} height={100} />
 
       {
         frontmatter.faq && frontmatter.faq.length > 0 && (
           <section class="faq">
-            <h2>常见问题</h2>
+            <h2>{t.faq}</h2>
             <dl>
               {frontmatter.faq.map((f) => (
                 <>
@@ -141,7 +145,7 @@ const faqSchema =
 
     {related.length > 0 && (
       <section class="related">
-        <h2>相关阅读</h2>
+        <h2>{t.related}</h2>
         <ul style="list-style:none;padding:0">
           {related.map((r) => (
             <li style="margin-bottom:8px">

@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { site } from '../../../site.config.mjs';
+import { withLocale } from '../../i18n';
+
+const description =
+  'About AI Efficiency Lab: practical guides on AI tools, automation, and productivity, reviewed against an editorial checklist before publishing.';
+---
+
+<BaseLayout lang="en" title="About" description={description}>
+  <div class="container prose">
+    <Breadcrumb lang="en" items={[{ label: 'About' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>About AI Efficiency Lab</h1>
+      <p>
+        AI Efficiency Lab publishes practical guides for operators, marketers, and small teams who want AI tools,
+        automation, and clearer ways of working.
+      </p>
+
+      <h2>What we publish</h2>
+      <p>
+        Reviews you can act on, workflows for repeated work, and prompt templates you can copy. Prices and quotas
+        change often, so we say when a figure needs to be checked on the vendor’s site.
+      </p>
+      <ul>
+        <li>Choose a tool for a real task, not from a popularity list</li>
+        <li>Turn a repeated chore into a workflow with a failure alert</li>
+        <li>Keep prompts and checklists that a new teammate can use on day one</li>
+      </ul>
+
+      <h2>How articles are produced</h2>
+      <p>
+        Drafts are prepared with AI, then checked for structure, length, and duplication before they go live.
+        We revise pages when the steps no longer match the product.
+      </p>
+
+      <h2>Editorial rules</h2>
+      <ul>
+        <li>A conclusion needs a step someone can follow</li>
+        <li>Prices, limits, and versions are dated, and should be rechecked</li>
+        <li>If something is wrong, tell us via the <a href={withLocale('en', '/contact/')}>contact page</a></li>
+      </ul>
+
+      {site.ads.enabled && (
+        <>
+          <h2>Advertising</h2>
+          <p>
+            The site is funded by display ads. Ads are separate from the guides. A paid placement, if we ever run one,
+            will be labeled in the article.
+          </p>
+        </>
+      )}
+    </article>
+  </div>
+</BaseLayout>

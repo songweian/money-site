@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { topics, ui, withLocale } from '../../i18n';
+
+const lang = 'en' as const;
+const t = ui.en;
+const posts = (await getCollection('enPosts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const latest = posts.slice(0, 6);
+const counts = Object.entries(topics.en).map(([slug, topic]) => ({
+  slug,
+  ...topic,
+  count: posts.filter((p) => p.data.topic === slug).length,
+}));
+---
+
+<BaseLayout lang={lang} description={t.siteDescription}>
+  <section class="hero">
+    <div class="container">
+      <h1>{t.tagline}</h1>
+      <p class="hero__sub">{t.siteDescription}</p>
+      <a class="btn" href={withLocale(lang, `/posts/${posts[0]?.id ?? ''}/`)}>{t.readLatest}</a>
+      <a class="btn btn--ghost" href={withLocale(lang, '/rss.xml')} style="margin-left:10px">{t.subscribe}</a>
+      <div class="hero__stats">
+        <div><b>{posts.length}</b> {t.articles}</div>
+        <div><b>{counts.length}</b> {t.topicCount}</div>
+        <div><b>{t.daily}</b> {t.dailyHint}</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="section">
+      <div class="section__head">
+        <h2>{t.latest}</h2>
+        <a href={withLocale(lang, '/topics/ai-tools/')}>{t.browseTopics}</a>
+      </div>
+      {
+        latest.length > 0 ? (
+          <div class="grid">
+            {latest.map((p) => <PostCard post={p} lang={lang} />)}
+          </div>
+        ) : (
+          <p class="empty">{t.emptyPosts}</p>
+        )
+      }
+    </section>
+
+    <AdSlot slot="inArticle" height={110} />
+
+    <section class="section">
+      <div class="section__head"><h2>{t.browseByTopic}</h2></div>
+      <div class="grid">
+        {
+          counts.map((topic) => (
+            <a class="card" href={withLocale(lang, `/topics/${topic.slug}/`)}>
+              <h3 class="card__title">{topic.name}</h3>
+              <p class="card__desc">{topic.description}</p>
+              <div class="card__meta"><span class="tag tag--brand">{topic.count} {t.postsUnit}</span></div>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <AdSlot slot="footer" height={110} />
+  </div>
+</BaseLayout>

@@ -25,9 +25,9 @@ const items = [
 
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="brand" href={href('/')} data-en={ui.en.siteTitle} data-en-href="/en/">
+    <a class="brand" href={href('/')} data-en-href="/en/">
       <span class="brand__mark" aria-hidden="true">AI</span>
-      <span>{lang === 'en' ? t.siteTitle : site.title}</span>
+      <span data-en={ui.en.siteTitle}>{lang === 'en' ? t.siteTitle : site.title}</span>
     </a>
     <nav class="nav" aria-label={lang === 'en' ? 'Main' : '主导航'}>
       {

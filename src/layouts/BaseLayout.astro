@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { site } from '../../site.config.mjs';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { ui, withLocale, type Lang } from '../i18n';
 
 interface Props {
   title?: string;
@@ -11,20 +12,26 @@ interface Props {
   ogImage?: string;
   noindex?: boolean;
   bodyClass?: string;
+  lang?: Lang;
 }
 
 const {
   title,
-  description = site.description,
+  description,
   canonical,
   ogImage,
   noindex = false,
   bodyClass = '',
+  lang = 'zh',
 } = Astro.props;
 
-const pageTitle =
-  title && title !== site.title ? `${title} | ${site.title}` : site.title;
+const t = ui[lang];
+const brand = lang === 'en' ? t.siteTitle : site.title;
+const metaDescription = description ?? (lang === 'en' ? t.siteDescription : site.description);
+const pageTitle = title && title !== brand ? `${title} | ${brand}` : brand;
 const canonicalURL = new URL(canonical ?? Astro.url.pathname, site.url).toString();
+const zhURL = new URL(withLocale('zh', Astro.url.pathname), site.url).toString();
+const enURL = new URL(withLocale('en', Astro.url.pathname), site.url).toString();
 const ogImageURL = ogImage
   ? new URL(ogImage, site.url).toString()
   : new URL('/og/default.svg', site.url).toString();
@@ -32,15 +39,15 @@ const ogImageURL = ogImage
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: site.title,
+  name: brand,
   url: site.url,
-  description: site.description,
-  inLanguage: site.lang,
+  description: metaDescription,
+  inLanguage: lang === 'en' ? 'en' : site.lang,
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: `${site.url}/search/?q={search_term_string}`,
+      urlTemplate: `${site.url}${withLocale(lang, '/search/')}?q={search_term_string}`,
     },
     'query-input': 'required name=search_term_string',
   },
@@ -48,35 +55,84 @@ const websiteSchema = {
 ---
 
 <!doctype html>
-<html lang={site.lang}>
+<html lang={lang === 'en' ? 'en' : site.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      (function () {
+        var ZH = { CN: 1, TW: 1, HK: 1, MO: 1 };
+        function read(name) {
+          var m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+          return m ? decodeURIComponent(m[1]) : '';
+        }
+        var pref = read('lang');
+        if (pref !== 'zh' && pref !== 'en') {
+          try { pref = localStorage.getItem('lang') || ''; } catch (e) { pref = ''; }
+        }
+        var path = location.pathname;
+        if (/\.(xml|txt|svg|json|jpg|png|webp|ico)$/i.test(path)) return;
+        var isEn = path === '/en' || path.indexOf('/en/') === 0;
+        function toEn(p) { return p === '/' ? '/en/' : '/en' + p; }
+        function toZh(p) {
+          var rest = p.replace(/^\/en/, '') || '/';
+          return rest.charAt(0) === '/' ? rest : '/' + rest;
+        }
+        if (pref === 'en' && !isEn) { location.replace(toEn(path) + location.search + location.hash); return; }
+        if (pref === 'zh' && isEn) { location.replace(toZh(path) + location.search + location.hash); return; }
+        if (pref === 'en' || pref === 'zh') return;
+        if (/bot|spider|crawl|slurp|mediapartners/i.test(navigator.userAgent)) return;
+        document.documentElement.classList.add('lang-pending');
+        function finish() { document.documentElement.classList.remove('lang-pending'); }
+        function apply(code) {
+          if (!code) { finish(); return; }
+          var wantEn = !ZH[code];
+          if (wantEn && !isEn) location.replace(toEn(path) + location.search + location.hash);
+          else if (!wantEn && isEn) location.replace(toZh(path) + location.search + location.hash);
+          else finish();
+        }
+        function fallback() {
+          var l = (navigator.language || '').toLowerCase();
+          apply(l.indexOf('zh') === 0 ? 'CN' : 'US');
+        }
+        var timer = setTimeout(finish, 1500);
+        fetch('/cdn-cgi/trace', { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+          .then(function (text) {
+            clearTimeout(timer);
+            var m = text.match(/^loc=([A-Z]{2})/m);
+            if (m) apply(m[1]);
+            else fallback();
+          })
+          .catch(function () { clearTimeout(timer); fallback(); });
+      })();
+    </script>
     <title>{pageTitle}</title>
-    <meta name="description" content={description} />
+    <meta name="description" content={metaDescription} />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="zh-CN" href={zhURL} />
+    <link rel="alternate" hreflang="en" href={enURL} />
+    <link rel="alternate" hreflang="x-default" href={zhURL} />
     <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
     <meta name="author" content={site.author.name} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={site.title} />
+    <meta property="og:site_name" content={brand} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
-    <meta property="og:locale" content={site.locale} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : site.locale} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogImageURL} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${site.title} RSS`} href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${brand} RSS`} href={withLocale(lang, '/rss.xml')} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <!-- AdSense（启用后自动注入） -->
     {
       site.ads.enabled && site.ads.client && (
         <script
@@ -87,7 +143,6 @@ const websiteSchema = {
       )
     }
 
-    <!-- 站长验证 -->
     {site.analytics?.googleSiteVerification && (
       <meta name="google-site-verification" content={site.analytics.googleSiteVerification} />
     )}
@@ -99,11 +154,50 @@ const websiteSchema = {
     <slot name="head" />
   </head>
   <body class={bodyClass}>
-    <a class="skip-link" href="#main">跳到主要内容</a>
-    <Header />
+    <a class="skip-link" href="#main" data-en={ui.en.skip}>{lang === 'en' ? t.skip : ui.zh.skip}</a>
+    <Header lang={lang} />
     <main id="main">
       <slot />
     </main>
-    <Footer />
+    <Footer lang={lang} />
+    <script is:inline>
+      (function () {
+        function destFor(lang) {
+          var path = location.pathname;
+          var isEn = path === '/en' || path.indexOf('/en/') === 0;
+          var dest = lang === 'en'
+            ? (isEn ? path : (path === '/' ? '/en/' : '/en' + path))
+            : (isEn ? (path.replace(/^\/en/, '') || '/') : path);
+          if (dest.charAt(0) !== '/') dest = '/' + dest;
+          if (dest !== '/' && !dest.endsWith('/') && !/\.[a-z0-9]+$/i.test(dest)) dest += '/';
+          return dest;
+        }
+        document.addEventListener('click', function (e) {
+          var node = e.target;
+          var a = node && node.closest ? node.closest('[data-set-lang]') : null;
+          if (!a) return;
+          e.preventDefault();
+          var lang = a.getAttribute('data-set-lang');
+          if (lang !== 'zh' && lang !== 'en') return;
+          document.cookie = 'lang=' + lang + '; Path=/; Max-Age=31536000; SameSite=Lax';
+          try { localStorage.setItem('lang', lang); } catch (err) {}
+          location.href = destFor(lang) + location.search + location.hash;
+        });
+        if ((document.documentElement.lang || '').indexOf('en') === 0) return;
+        var pref = '';
+        var m = document.cookie.match(/(?:^|; )lang=(zh|en)/);
+        pref = m ? m[1] : '';
+        if (!pref) { try { pref = localStorage.getItem('lang') || ''; } catch (err) { pref = ''; } }
+        var pathEn = location.pathname === '/en' || location.pathname.indexOf('/en/') === 0;
+        if (pref === 'zh' || (!pathEn && pref !== 'en')) return;
+        document.documentElement.lang = 'en';
+        document.querySelectorAll('[data-en]').forEach(function (el) {
+          el.textContent = el.getAttribute('data-en');
+        });
+        document.querySelectorAll('[data-en-href]').forEach(function (el) {
+          el.setAttribute('href', el.getAttribute('data-en-href'));
+        });
+      })();
+    </script>
   </body>
 </html>
