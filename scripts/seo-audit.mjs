@@ -57,13 +57,16 @@ for (const file of htmlFiles) {
     .replace(/<[^>]+>/g, ' ')
     .replace(/&[a-z]+;/g, ' ');
   const cjk = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const enWords = (text.match(/[A-Za-z]+/g) || []).length;
+  const isEnPost = rel.startsWith('en/posts/') || rel.startsWith(`en${path.sep}posts${path.sep}`);
   if (rel.startsWith('posts/') && cjk < site.content.minWords * 0.6)
     add(`正文字数偏少（约 ${cjk} 字）`);
+  if (isEnPost && enWords < 280) add(`英文正文字数偏少（约 ${enWords} 词）`);
   stats.words += cjk;
 
   const internal = [...html.matchAll(/href="(\/[^"]*)"/g)].length;
   stats.internalLinks += internal;
-  if (rel.startsWith('posts/') && internal < 3) add(`内链偏少（${internal} 个）`);
+  if ((rel.startsWith('posts/') || isEnPost) && internal < 3) add(`内链偏少（${internal} 个）`);
 
   const imgs = [...html.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
   for (const img of imgs) if (!/alt=/.test(img)) add('存在无 alt 的图片');

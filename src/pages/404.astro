@@ -10,10 +10,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div class="container prose">
     <section class="section" style="text-align:center;padding:80px 0">
       <h1 style="font-size:3rem;margin-bottom:8px">404</h1>
-      <p style="color:var(--c-text-soft)">这个页面不存在，可能被移动或删除了。</p>
+      <p style="color:var(--c-text-soft)" data-en="This page does not exist. It may have moved.">这个页面不存在，可能被移动或删除了。</p>
       <p>
-        <a class="btn" href="/">回到首页</a>
-        <a class="btn btn--ghost" href="/search/" style="margin-left:10px">搜索内容</a>
+        <a class="btn" href="/" data-en="Back home" data-en-href="/en/">回到首页</a>
+        <a class="btn btn--ghost" href="/search/" data-en="Search" data-en-href="/en/search/" style="margin-left:10px">搜索内容</a>
       </p>
     </section>
   </div>
