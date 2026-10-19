@@ -226,6 +226,38 @@ th {
   color: var(--c-brand);
   text-decoration: none;
 }
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  overflow: hidden;
+  flex: none;
+}
+.lang-switch a {
+  padding: 3px 10px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--c-text-soft);
+  border-radius: 0;
+}
+.lang-switch a[aria-current='true'] {
+  background: var(--c-brand);
+  color: #fff;
+}
+.lang-switch a:hover {
+  background: var(--c-bg-mute);
+  color: var(--c-text);
+  text-decoration: none;
+}
+.lang-switch a[aria-current='true']:hover {
+  background: var(--c-brand-dark);
+  color: #fff;
+}
+html.lang-pending body {
+  visibility: hidden;
+}
 
 /* ============ 首页 ============ */
 .hero {

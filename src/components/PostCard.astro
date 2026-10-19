@@ -1,15 +1,17 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { site } from '../../site.config.mjs';
+import { topics, withLocale, type Lang } from '../i18n';
 
 interface Props {
-  post: CollectionEntry<'posts'>;
+  post: CollectionEntry<'posts'> | CollectionEntry<'enPosts'>;
   topicName?: string;
+  lang?: Lang;
 }
-const { post, topicName } = Astro.props;
+const { post, topicName, lang = 'zh' } = Astro.props;
 const { title, description, pubDate, tags, topic } = post.data;
-const topicInfo = site.niche.topics.find((t) => t.slug === topic);
-const dateStr = pubDate.toLocaleDateString('zh-CN', {
+const topicInfo = lang === 'en' ? topics.en[topic] : topics.zh[topic] ?? site.niche.topics.find((t) => t.slug === topic);
+const dateStr = pubDate.toLocaleDateString(lang === 'en' ? 'en-US' : 'zh-CN', {
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
@@ -17,7 +19,7 @@ const dateStr = pubDate.toLocaleDateString('zh-CN', {
 });
 ---
 
-<a class="card" href={`/posts/${post.id}/`}>
+<a class="card" href={withLocale(lang, `/posts/${post.id}/`)}>
   <div class="card__meta">
     <span class="tag tag--brand">{topicName ?? topicInfo?.name ?? topic}</span>
     <time datetime={pubDate.toISOString()}>{dateStr}</time>

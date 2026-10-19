@@ -1,25 +1,51 @@
 ---
 import { site } from '../../site.config.mjs';
+import { ui, withLocale, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+const { lang = 'zh' } = Astro.props;
+const t = ui[lang];
 const path = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === '/' ? path === '/' || path === '/index.html' : path.startsWith(href);
+const href = (p: string) => withLocale(lang, p);
+const isActive = (p: string) => {
+  const target = href(p);
+  return p === '/' ? path === target : path.startsWith(target);
+};
+const items = [
+  { href: '/', label: t.home, en: ui.en.home },
+  { href: '/topics/ai-tools/', label: t.navAi, en: ui.en.navAi },
+  { href: '/topics/automation/', label: t.navAutomation, en: ui.en.navAutomation },
+  { href: '/topics/prompt/', label: t.navPrompt, en: ui.en.navPrompt },
+  { href: '/about/', label: t.about, en: ui.en.about },
+  { href: '/search/', label: t.search, en: ui.en.search },
+];
 ---
 
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="brand" href="/">
+    <a class="brand" href={href('/')} data-en={ui.en.siteTitle} data-en-href="/en/">
       <span class="brand__mark" aria-hidden="true">AI</span>
-      <span>{site.title}</span>
+      <span>{lang === 'en' ? t.siteTitle : site.title}</span>
     </a>
-    <nav class="nav" aria-label="主导航">
+    <nav class="nav" aria-label={lang === 'en' ? 'Main' : '主导航'}>
       {
-        site.nav.map((item) => (
-          <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+        items.map((item) => (
+          <a
+            href={href(item.href)}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+            data-en={item.en}
+            data-en-href={withLocale('en', item.href)}
+          >
             {item.label}
           </a>
         ))
       }
-      <a href="/search/" aria-current={isActive('/search/') ? 'page' : undefined}>搜索</a>
+      <div class="lang-switch" role="group" aria-label={t.language}>
+        <a href={withLocale('zh', path)} data-set-lang="zh" aria-current={lang === 'zh' ? 'true' : undefined} lang="zh">中文</a>
+        <a href={withLocale('en', path)} data-set-lang="en" aria-current={lang === 'en' ? 'true' : undefined} lang="en">EN</a>
+      </div>
     </nav>
   </div>
 </header>

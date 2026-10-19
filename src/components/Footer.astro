@@ -1,30 +1,61 @@
 ---
 import { site } from '../../site.config.mjs';
+import { topics, ui, withLocale, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+const { lang = 'zh' } = Astro.props;
+const t = ui[lang];
+const href = (p: string) => withLocale(lang, p);
 const year = new Date().getFullYear();
+const topicEntries = Object.entries(topics[lang]);
+const aboutLinks = [
+  { href: '/about/', label: t.aboutTitle, en: ui.en.aboutTitle },
+  { href: '/privacy/', label: lang === 'en' ? 'Privacy' : '隐私政策', en: 'Privacy' },
+  { href: '/contact/', label: t.contactTitle, en: ui.en.contactTitle },
+  { href: '/rss.xml', label: 'RSS', en: 'RSS' },
+];
 ---
 
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__cols">
       <div style="max-width:46ch">
-        <div style="font-weight:700;color:var(--c-text);margin-bottom:6px">{site.title}</div>
-        <p style="margin:0">{site.description}</p>
+        <div style="font-weight:700;color:var(--c-text);margin-bottom:6px" data-en={ui.en.siteTitle}>
+          {lang === 'en' ? t.siteTitle : site.title}
+        </div>
+        <p style="margin:0" data-en={ui.en.siteDescription}>{lang === 'en' ? t.siteDescription : site.description}</p>
       </div>
       <div>
-        <div style="font-weight:600;margin-bottom:8px">栏目</div>
+        <div style="font-weight:600;margin-bottom:8px" data-en={ui.en.topics}>{t.topics}</div>
         <div class="site-footer__links">
-          {site.niche.topics.map((t) => <a href={`/topics/${t.slug}/`}>{t.name}</a>)}
+          {
+            topicEntries.map(([slug, topic]) => (
+              <a href={href(`/topics/${slug}/`)} data-en={topics.en[slug].name} data-en-href={withLocale('en', `/topics/${slug}/`)}>
+                {topic.name}
+              </a>
+            ))
+          }
         </div>
       </div>
       <div>
-        <div style="font-weight:600;margin-bottom:8px">关于</div>
+        <div style="font-weight:600;margin-bottom:8px" data-en={ui.en.footerAbout}>{t.footerAbout}</div>
         <div class="site-footer__links">
-          {site.footerLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+          {
+            aboutLinks.map((l) => (
+              <a href={href(l.href)} data-en={l.en} data-en-href={withLocale('en', l.href)}>
+                {l.label}
+              </a>
+            ))
+          }
         </div>
       </div>
     </div>
     <div class="site-footer__bottom">
-      <div>© {year} {site.copyrightHolder} · 本站内容由 AI 辅助生成并经人工流程校验</div>
+      <div data-en={`© ${year} ${ui.en.siteTitle} · ${ui.en.copyright}`}>
+        © {year} {lang === 'en' ? t.siteTitle : site.copyrightHolder} · {t.copyright}
+      </div>
       {site.icp && <div style="margin-top:6px">{site.icp}</div>}
     </div>
   </div>

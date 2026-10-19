@@ -1,14 +1,17 @@
 ---
+import { site } from '../../site.config.mjs';
+import { ui, withLocale, type Lang } from '../i18n';
+
 interface Crumb {
   href?: string;
   label: string;
 }
 interface Props {
   items: Crumb[];
+  lang?: Lang;
 }
-const { items } = Astro.props;
-import { site } from '../../site.config.mjs';
-const all = [{ href: '/', label: '首页' }, ...items];
+const { items, lang = 'zh' } = Astro.props;
+const all = [{ href: withLocale(lang, '/'), label: ui[lang].home }, ...items];
 ---
 
 <nav class="breadcrumb" aria-label="面包屑导航">

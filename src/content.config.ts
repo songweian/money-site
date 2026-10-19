@@ -1,9 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-const posts = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
-  schema: z.object({
+const postSchema = z.object({
     title: z.string().min(4).max(70),
     // 摘要：搜索引擎最常抓取的片段，60-160 字最佳
     description: z.string().min(40).max(165),
@@ -28,7 +26,16 @@ const posts = defineCollection({
       .optional(),
     // AI 生成元数据，便于后期复盘
     aiGenerated: z.boolean().default(true),
-  }),
+  });
+
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  schema: postSchema,
 });
 
-export const collections = { posts };
+const enPosts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/en' }),
+  schema: postSchema,
+});
+
+export const collections = { posts, enPosts };
