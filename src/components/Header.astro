@@ -1,0 +1,25 @@
+---
+import { site } from '../../site.config.mjs';
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' || path === '/index.html' : path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark" aria-hidden="true">AI</span>
+      <span>{site.title}</span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      {
+        site.nav.map((item) => (
+          <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+      <a href="/search/" aria-current={isActive('/search/') ? 'page' : undefined}>搜索</a>
+    </nav>
+  </div>
+</header>

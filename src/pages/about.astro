@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { site } from '../../site.config.mjs';
+---
+
+<BaseLayout
+  title="关于我们"
+  description={`关于 ${site.title}：一个专注「${site.niche.name}」的内容站，我们用 AI 自动完成选题、初稿与校验流程，持续产出可落地的实操指南与工具评测。`}
+>
+  <div class="container prose">
+    <Breadcrumb items={[{ label: '关于我们' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>关于 {site.title}</h1>
+      <p>
+        {site.title} 是一个专注于「{site.niche.name}」的内容站，面向{site.niche.audience}。
+      </p>
+
+      <h2>我们做什么</h2>
+      <p>{site.niche.brief}</p>
+      <ul>
+        <li>对主流工具做真实上手评测，给出可直接执行的选型建议</li>
+        <li>把重复劳动抽象成可复用的自动化工作流</li>
+        <li>沉淀可直接复制使用的提示词模板与配置片段</li>
+      </ul>
+
+      <h2>内容生产方式</h2>
+      <p>
+        本站采用「AI 生成 + 规则校验 + 持续迭代」的方式生产内容：由自动化流水线完成选题、资料整理与初稿撰写，
+        再经过字数、结构、关键词密度、重复度等规则校验后才发布。我们会对已发布内容定期复查与更新。
+      </p>
+
+      <h2>内容准则</h2>
+      <ul>
+        <li>结论必须有可执行的步骤或数据支撑，不写无法落地的空话</li>
+        <li>涉及价格、配额等易变信息时标注时间，并定期复核</li>
+        <li>如内容存在错误，欢迎通过<a href="/contact/">联系我们</a>指出，我们会及时更正</li>
+      </ul>
+
+      {site.ads.enabled && (
+        <>
+          <h2>广告与商业合作</h2>
+          <p>
+            本站通过展示广告获得收入以维持运营。广告与 editorial 内容相互独立，
+            评测结论不受商业合作影响；如存在付费推广内容，会在文章中明确标注。
+          </p>
+        </>
+      )}
+    </article>
+  </div>
+</BaseLayout>

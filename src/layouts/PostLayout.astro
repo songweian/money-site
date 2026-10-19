@@ -1,0 +1,155 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { site } from '../../site.config.mjs';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    topic: string;
+    tags?: string[];
+    keyword?: string;
+    author?: string;
+    heroImage?: string;
+    faq?: { q: string; a: string }[];
+  };
+  headings: Heading[];
+  slug: string;
+  related: { title: string; href: string }[];
+}
+const { frontmatter, headings, slug, related } = Astro.props;
+
+const topicInfo = site.niche.topics.find((t) => t.slug === frontmatter.topic);
+const toc = headings.filter((h) => h.depth === 2);
+const postUrl = new URL(`/posts/${slug}/`, site.url).toString();
+const fmt = (d: Date) =>
+  d.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: site.timezone,
+  });
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: frontmatter.title,
+  description: frontmatter.description,
+  image: frontmatter.heroImage ? new URL(frontmatter.heroImage, site.url).toString() : undefined,
+  datePublished: frontmatter.pubDate.toISOString(),
+  dateModified: (frontmatter.updatedDate ?? frontmatter.pubDate).toISOString(),
+  inLanguage: site.lang,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
+  author: { '@type': 'Organization', name: frontmatter.author ?? site.author.name, url: site.url },
+  publisher: {
+    '@type': 'Organization',
+    name: site.title,
+    url: site.url,
+    logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', site.url).toString() },
+  },
+  keywords: [frontmatter.keyword, ...(frontmatter.tags ?? [])].filter(Boolean).join(', '),
+};
+
+const faqSchema =
+  frontmatter.faq && frontmatter.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: frontmatter.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+---
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description} ogImage={frontmatter.heroImage}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} is:inline />
+  {faqSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(faqSchema)} is:inline />}
+
+  <div class="container prose">
+    <Breadcrumb
+      items={[
+        { href: `/topics/${frontmatter.topic}/`, label: topicInfo?.name ?? frontmatter.topic },
+        { label: frontmatter.title },
+      ]}
+    />
+
+    <article class="post-head">
+      <h1>{frontmatter.title}</h1>
+      <p style="font-size:1.08rem;color:var(--c-text-soft);margin-bottom:16px">
+        {frontmatter.description}
+      </p>
+      <div class="post-meta">
+        <span>{frontmatter.author ?? site.author.name}</span>
+        <time datetime={frontmatter.pubDate.toISOString()}>发布于 {fmt(frontmatter.pubDate)}</time>
+        {frontmatter.updatedDate && (
+          <time datetime={frontmatter.updatedDate.toISOString()}>更新于 {fmt(frontmatter.updatedDate)}</time>
+        )}
+        {topicInfo && <a href={`/topics/${frontmatter.topic}/`}>{topicInfo.name}</a>}
+      </div>
+
+      <AdSlot slot="header" label="广告" height={90} />
+
+      {toc.length >= 3 && (
+        <nav class="toc" aria-label="目录">
+          <p class="toc__title">本文目录</p>
+          <ol>
+            {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ol>
+        </nav>
+      )}
+
+      <div class="post-body">
+        <slot />
+      </div>
+
+      {frontmatter.tags && frontmatter.tags.length > 0 && (
+        <p style="margin-top:30px">
+          {frontmatter.tags.map((t) => <span class="tag" style="margin-right:6px">#{t}</span>)}
+        </p>
+      )}
+
+      <AdSlot slot="footer" label="广告" height={100} />
+
+      {
+        frontmatter.faq && frontmatter.faq.length > 0 && (
+          <section class="faq">
+            <h2>常见问题</h2>
+            <dl>
+              {frontmatter.faq.map((f) => (
+                <>
+                  <dt>{f.q}</dt>
+                  <dd>{f.a}</dd>
+                </>
+              ))}
+            </dl>
+          </section>
+        )
+      }
+    </article>
+
+    {related.length > 0 && (
+      <section class="related">
+        <h2>相关阅读</h2>
+        <ul style="list-style:none;padding:0">
+          {related.map((r) => (
+            <li style="margin-bottom:8px">
+              <a href={r.href}>{r.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </div>
+</BaseLayout>

@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { site } from '../../site.config.mjs';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  topicName?: string;
+}
+const { post, topicName } = Astro.props;
+const { title, description, pubDate, tags, topic } = post.data;
+const topicInfo = site.niche.topics.find((t) => t.slug === topic);
+const dateStr = pubDate.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: site.timezone,
+});
+---
+
+<a class="card" href={`/posts/${post.id}/`}>
+  <div class="card__meta">
+    <span class="tag tag--brand">{topicName ?? topicInfo?.name ?? topic}</span>
+    <time datetime={pubDate.toISOString()}>{dateStr}</time>
+  </div>
+  <h3 class="card__title">{title}</h3>
+  <p class="card__desc">{description}</p>
+  {tags.length > 0 && (
+    <div class="card__meta">
+      {tags.slice(0, 3).map((t) => <span class="tag">#{t}</span>)}
+    </div>
+  )}
+</a>

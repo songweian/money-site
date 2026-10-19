@@ -1,0 +1,75 @@
+name: 每日内容自动生成
+
+# 每天北京时间 09:00 自动生成新文章并推送，Cloudflare Pages 会自动触发部署
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '本次生成篇数'
+        required: false
+        default: '1'
+      topic:
+        description: '限定栏目 slug（留空则自动分配）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-content
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 生成文章
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL || 'https://api.openai.com/v1' }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.count }}" ]; then ARGS="$ARGS --count=${{ github.event.inputs.count }}"; fi
+          if [ -n "${{ github.event.inputs.topic }}" ]; then ARGS="$ARGS --topic=${{ github.event.inputs.topic }}"; fi
+          node scripts/generate-content.mjs $ARGS
+
+      - name: 构建校验 + SEO 自检
+        run: |
+          npm run build
+          npm run seo:audit
+
+      - name: 提交新内容
+        run: |
+          git config user.name "ai-bot"
+          git config user.email "ai-bot@users.noreply.github.com"
+          git add src/content/posts
+          git diff --cached --quiet || git commit -m "content: AI 自动生成内容 $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
+
+      - name: 失败告警
+        if: failure()
+        run: |
+          if [ -n "${{ secrets.ALERT_WEBHOOK }}" ]; then
+            curl -sS -X POST -H 'Content-Type: application/json' \
+              -d '{"text":"⚠️ 内容生成流水线失败：'"$GITHUB_REPOSITORY"' / '"$GITHUB_WORKFLOW"'，请查看 Actions 日志。"}' \
+              "${{ secrets.ALERT_WEBHOOK }}"
+          else
+            echo "未配置 ALERT_WEBHOOK，跳过告警推送"
+          fi

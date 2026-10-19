@@ -1,0 +1,26 @@
+{
+  "name": "money-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI 全自动运维的 SEO 内容站：自动生成文章 -> GitHub -> Cloudflare Pages 部署 -> 广告变现",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "gen": "node scripts/generate-content.mjs",
+    "gen:seed": "node scripts/generate-content.mjs --seed",
+    "gen:dry": "node scripts/generate-content.mjs --dry-run",
+    "seo:audit": "node scripts/seo-audit.mjs"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^5.13.0"
+  },
+  "engines": {
+    "node": ">=18.17.1"
+  }
+}

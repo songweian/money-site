@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { site } from '../../../site.config.mjs';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return site.niche.topics
+    .map((topic) => {
+      const list = posts
+        .filter((p) => p.data.topic === topic.slug)
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+      return { params: { topic: topic.slug }, props: { topic, posts: list } };
+    })
+    .filter((entry) => entry.props.posts.length > 0);
+}
+
+const { topic, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={topic.name}
+  description={`${topic.name}栏目：${topic.description}。${site.title}已发布 ${posts.length} 篇实操文章，覆盖选型对比、落地步骤与常见问题，内容持续更新。`}
+>
+  <div class="container">
+    <Breadcrumb items={[{ label: topic.name }]} />
+    <section class="section" style="padding-top:22px">
+      <h1>{topic.name}</h1>
+      <p style="color:var(--c-text-soft);max-width:62ch">{topic.description}</p>
+      <AdSlot slot="header" height={90} />
+      <div class="grid">
+        {posts.map((p) => <PostCard post={p} topicName={topic.name} />)}
+      </div>
+      <AdSlot slot="footer" height={100} />
+    </section>
+  </div>
+</BaseLayout>

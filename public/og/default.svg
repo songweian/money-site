@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eaf1ff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f6df6"/>
+      <stop offset="1" stop-color="#7aa7ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="72" y="72" width="88" height="88" rx="22" fill="url(#brand)"/>
+  <path d="M100 138 L118 94 L136 126 L150 110 L172 138" fill="none" stroke="#ffffff"
+        stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="72" y="330" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif"
+        font-size="76" font-weight="800" fill="#16181d">AI 效能实验室</text>
+  <text x="72" y="410" font-family="-apple-system,PingFang SC,Microsoft YaHei,sans-serif"
+        font-size="40" fill="#4a515c">用 AI 工具把工作效率翻倍的实战指南</text>
+  <rect x="72" y="470" width="240" height="8" rx="4" fill="url(#brand)"/>
+</svg>

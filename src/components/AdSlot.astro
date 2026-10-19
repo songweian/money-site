@@ -1,0 +1,43 @@
+---
+/**
+ * 广告位组件。
+ * - 未配置 AdSense client 时渲染占位块（本地开发可见，不影响收录）
+ * - 配置后自动输出真实的 <ins class="adsbygoogle"> 单元
+ */
+import { site } from '../../site.config.mjs';
+
+interface Props {
+  slot?: 'header' | 'inArticle' | 'sidebar' | 'footer';
+  label?: string;
+  height?: number;
+  style?: string;
+}
+const { slot = 'inArticle', label = '广告', height = 100, style = 'display:block' } = Astro.props;
+
+const client = site.ads.client;
+const slotId = site.ads.slots?.[slot] ?? '';
+const live = site.ads.enabled && client && slotId;
+---
+
+<div class="adslot" style={`min-height:${height}px`}>
+  {
+    live ? (
+      <>
+        <div class="adslot__label">{label}</div>
+        <ins
+          class="adsbygoogle"
+          style={style}
+          data-ad-client={client}
+          data-ad-slot={slotId}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        ></ins>
+        <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </>
+    ) : (
+      <div class="adslot__placeholder" style={`min-height:${height}px`}>
+        广告位 · {slot}（AdSense 批准后在此展示）
+      </div>
+    )
+  }
+</div>

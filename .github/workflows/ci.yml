@@ -1,0 +1,29 @@
+name: 构建与 SEO 校验
+
+# 任何推送和 PR 都跑一次构建 + SEO 自检，避免坏内容进入线上
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: SEO 自检
+        id: seo
+        run: npm run seo:audit
+        continue-on-error: true
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist

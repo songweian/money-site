@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { site } from '../../site.config.mjs';
+const domain = new URL(site.url).hostname;
+---
+
+<BaseLayout
+  title="隐私政策"
+  description={`${site.title} 的隐私政策：说明我们收集哪些信息、如何使用 Cookie、Cloudflare 与广告服务如何处理数据，以及你如何管理自己的隐私设置。`}
+>
+  <div class="container prose">
+    <Breadcrumb items={[{ label: '隐私政策' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>隐私政策</h1>
+      <p>最后更新：{new Date().toLocaleDateString('zh-CN', { timeZone: site.timezone })}</p>
+
+      <h2>我们收集的信息</h2>
+      <p>
+        访问 {domain} 时，我们不会要求你注册账号或提交个人信息。我们可能收集匿名化的访问统计数据
+        （例如访问页面、来源渠道、大致地区），用于改进内容质量。
+      </p>
+
+      <h2>Cookie 与第三方服务</h2>
+      <p>本站使用以下第三方服务，它们可能通过 Cookie 收集数据：</p>
+      <ul>
+        <li><strong>Cloudflare</strong>：CDN 与安全防护，用于保障访问速度与安全</li>
+        {
+          site.ads.enabled && (
+            <li>
+              <strong>Google AdSense</strong>：用于展示广告。Google 及其合作伙伴可能使用 Cookie
+              根据你的访问记录投放个性化广告。你可以在
+              <a href="https://www.google.com/settings/ads" rel="nofollow noopener" target="_blank">Google 广告设置</a>
+              中关闭个性化广告。
+            </li>
+          )
+        }
+      </ul>
+      <p>你也可以在浏览器中直接禁用 Cookie，但可能会影响部分功能正常使用。</p>
+
+      <h2>日志数据</h2>
+      <p>
+        与绝大多数网站一样，我们的服务器会记录访问日志（IP 地址、浏览器类型、访问时间、来源页面），
+        用于排查故障与统计分析。这些信息不会与你的身份关联。
+      </p>
+
+      <h2>外部链接</h2>
+      <p>本站包含指向其他网站的链接，我们不对这些网站的隐私实践负责，建议你查看其隐私政策。</p>
+
+      <h2>政策更新</h2>
+      <p>我们可能不时更新本政策，更新后的版本将发布在本页面。</p>
+
+      <h2>联系我们</h2>
+      <p>如对本政策有疑问，请通过<a href="/contact/">联系页面</a>与我们沟通。</p>
+    </article>
+  </div>
+</BaseLayout>

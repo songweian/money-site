@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import { site } from '../../site.config.mjs';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description = site.description,
+  canonical,
+  ogImage,
+  noindex = false,
+  bodyClass = '',
+} = Astro.props;
+
+const pageTitle =
+  title && title !== site.title ? `${title} | ${site.title}` : site.title;
+const canonicalURL = new URL(canonical ?? Astro.url.pathname, site.url).toString();
+const ogImageURL = ogImage
+  ? new URL(ogImage, site.url).toString()
+  : new URL('/og/default.svg', site.url).toString();
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.title,
+  url: site.url,
+  description: site.description,
+  inLanguage: site.lang,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${site.url}/search/?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+---
+
+<!doctype html>
+<html lang={site.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="robots" content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'} />
+    <meta name="author" content={site.author.name} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:locale" content={site.locale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.title} RSS`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- AdSense（启用后自动注入） -->
+    {
+      site.ads.enabled && site.ads.client && (
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.ads.client}`}
+          crossorigin="anonymous"
+        ></script>
+      )
+    }
+
+    <!-- 站长验证 -->
+    {site.analytics?.googleSiteVerification && (
+      <meta name="google-site-verification" content={site.analytics.googleSiteVerification} />
+    )}
+    {site.analytics?.baiduSiteVerification && (
+      <meta name="baidu-site-verification" content={site.analytics.baiduSiteVerification} />
+    )}
+
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} is:inline />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

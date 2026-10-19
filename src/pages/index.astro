@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import AdSlot from '../components/AdSlot.astro';
+import { site } from '../../site.config.mjs';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const latest = posts.slice(0, 6);
+const topicCounts = site.niche.topics.map((t) => ({
+  ...t,
+  count: posts.filter((p) => p.data.topic === t.slug).length,
+}));
+---
+
+<BaseLayout>
+  <section class="hero">
+    <div class="container">
+      <h1>{site.tagline}</h1>
+      <p class="hero__sub">{site.description}</p>
+      <a class="btn" href={`/posts/${posts[0]?.id ?? ''}/`}>阅读最新文章</a>
+      <a class="btn btn--ghost" href="/rss.xml" style="margin-left:10px">订阅 RSS</a>
+      <div class="hero__stats">
+        <div><b>{posts.length}</b> 篇深度文章</div>
+        <div><b>{site.niche.topics.length}</b> 个专题栏目</div>
+        <div><b>每日</b> 自动更新</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="section">
+      <div class="section__head">
+        <h2>最新文章</h2>
+        <a href="/topics/ai-tools/">查看全部栏目 →</a>
+      </div>
+      {
+        latest.length > 0 ? (
+          <div class="grid">
+            {latest.map((p) => <PostCard post={p} />)}
+          </div>
+        ) : (
+          <p class="empty">还没有文章，运行 <code>npm run gen:seed</code> 生成首批内容。</p>
+        )
+      }
+    </section>
+
+    <AdSlot slot="inArticle" height={110} />
+
+    <section class="section">
+      <div class="section__head"><h2>按专题浏览</h2></div>
+      <div class="grid">
+        {
+          topicCounts.map((t) => (
+            <a class="card" href={`/topics/${t.slug}/`}>
+              <h3 class="card__title">{t.name}</h3>
+              <p class="card__desc">{t.description}</p>
+              <div class="card__meta"><span class="tag tag--brand">{t.count} 篇</span></div>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <AdSlot slot="footer" height={110} />
+  </div>
+</BaseLayout>

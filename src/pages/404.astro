@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="页面不存在"
+  description="抱歉，你访问的页面不存在或已被移动。你可以回到首页浏览最新文章，或使用站内搜索查找你需要的 AI 工具与效率提升内容。"
+  noindex={true}
+>
+  <div class="container prose">
+    <section class="section" style="text-align:center;padding:80px 0">
+      <h1 style="font-size:3rem;margin-bottom:8px">404</h1>
+      <p style="color:var(--c-text-soft)">这个页面不存在，可能被移动或删除了。</p>
+      <p>
+        <a class="btn" href="/">回到首页</a>
+        <a class="btn btn--ghost" href="/search/" style="margin-left:10px">搜索内容</a>
+      </p>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,42 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { site } from '../../../site.config.mjs';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+
+// 相关文章：同栏目优先，不足时按标签相似度补齐
+const all = (await getCollection('posts', ({ data }) => !data.draft)).filter(
+  (p) => p.id !== post.id
+);
+const sameTopic = all.filter((p) => p.data.topic === post.data.topic).slice(0, 4);
+const tagRelated = all
+  .filter((p) => p.data.topic !== post.data.topic)
+  .filter((p) => (p.data.tags ?? []).some((t) => (post.data.tags ?? []).includes(t)))
+  .slice(0, 4 - sameTopic.length);
+const related = [...sameTopic, ...tagRelated].map((p) => ({
+  title: p.data.title,
+  href: `/posts/${p.id}/`,
+}));
+---
+
+<PostLayout
+  frontmatter={post.data}
+  headings={headings}
+  slug={post.id}
+  related={related}
+>
+  <Content />
+</PostLayout>

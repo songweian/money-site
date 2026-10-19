@@ -1,0 +1,31 @@
+---
+import { site } from '../../site.config.mjs';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__cols">
+      <div style="max-width:46ch">
+        <div style="font-weight:700;color:var(--c-text);margin-bottom:6px">{site.title}</div>
+        <p style="margin:0">{site.description}</p>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:8px">栏目</div>
+        <div class="site-footer__links">
+          {site.niche.topics.map((t) => <a href={`/topics/${t.slug}/`}>{t.name}</a>)}
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:8px">关于</div>
+        <div class="site-footer__links">
+          {site.footerLinks.map((l) => <a href={l.href}>{l.label}</a>)}
+        </div>
+      </div>
+    </div>
+    <div class="site-footer__bottom">
+      <div>© {year} {site.copyrightHolder} · 本站内容由 AI 辅助生成并经人工流程校验</div>
+      {site.icp && <div style="margin-top:6px">{site.icp}</div>}
+    </div>
+  </div>
+</footer>

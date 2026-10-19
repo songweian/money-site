@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { site } from '../../site.config.mjs';
+---
+
+<BaseLayout
+  title="联系我们"
+  description={`联系 ${site.title} 编辑部：无论是发现内容错误、想提议一个 ${site.niche.name} 相关选题，还是商谈内容合作，都欢迎与我们沟通。`}
+>
+  <div class="container prose">
+    <Breadcrumb items={[{ label: '联系我们' }]} />
+    <article class="section" style="padding-top:22px">
+      <h1>联系我们</h1>
+      <p>无论是发现内容错误、想提议选题，还是商业合作，都欢迎与我们取得联系。</p>
+      <ul>
+        <li><strong>内容纠错</strong>：请附上文章链接与具体问题，我们会在核实后尽快更正</li>
+        <li><strong>选题建议</strong>：告诉我们你想了解的 {site.niche.name} 话题</li>
+        <li><strong>商业合作</strong>：请说明合作形式与产品背景，评测类内容不受商业合作影响</li>
+      </ul>
+      <div class="callout">
+        <strong>提示：</strong>在 <code>site.config.mjs</code> 中配置邮箱或表单地址后，本页会自动展示联系方式。
+      </div>
+    </article>
+  </div>
+</BaseLayout>
