@@ -104,14 +104,16 @@ npx wrangler@latest pages deploy dist --project-name money-site --branch main
 
 ## 四、收款：接入 AdSense
 
-1. 站点有 **10-20 篇**原创内容、且能正常访问后再申请，通过率显著更高。
-2. 申请地址：Google AdSense → 提交站点 → 等待审核（通常 1-2 周）。
-3. 通过后：
-   - 把 `site.ads.enabled` 改为 `true`
-   - 填入 `site.ads.client`（形如 `ca-pub-1234567890123456`）
-   - 在 AdSense 后台创建广告单元，把单元 ID 填进 `site.ads.slots` 对应位置
-   - 在 `public/ads.txt` 中取消注释并填入发布商 ID
-4. 广告位已内置在：文章头部、正文下方、栏目页、页脚。
+1. **申请**：见 [docs/adsense-apply.md](docs/adsense-apply.md)。注册与审核必须本人在 Google 账号下完成（涉及身份与收款），
+   建议内容到 10-20 篇后再提交，通过率显著更高。
+2. **接入**（拿到发布商 ID 后一条命令）：
+
+```bash
+node scripts/enable-ads.mjs ca-pub-1234567890123456 --slot-inArticle=1234567890 --deploy
+```
+
+脚本会自动开启 `site.ads.enabled`、写入 client 与广告单元 ID、更新 `public/ads.txt`，并可选择直接部署。
+3. 广告位已内置在：文章头部、正文下方、栏目页、页脚；拿到 ID 前显示占位块，不影响收录。
 
 > 提示：本站模板已包含隐私政策页（AdSense 审核必要条件）。国内主体备案通过后还可接入百度联盟等补充收入。
 
