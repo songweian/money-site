@@ -71,16 +71,15 @@ if (config === before) {
 }
 
 // ---- 2. 更新 ads.txt ----
+// 只保留一行 ASCII。中文注释和非 ASCII 字符会让 Google 的 ads.txt 爬虫判为格式错误。
 const numericId = pubId.replace('ca-pub-', '');
-const adsLine = `google.com, pub-${numericId}, DIRECT, f08c47fec0942fa0`;
-let adsTxt = fs.readFileSync(ADS_TXT, 'utf8');
-if (!adsTxt.includes(`pub-${numericId}`)) {
-  adsTxt = adsTxt.replace(/^# google\.com.*$/m, adsLine);
-  if (!adsTxt.includes(adsLine)) adsTxt = `${adsTxt.trimEnd()}\n${adsLine}\n`;
-  fs.writeFileSync(ADS_TXT, adsTxt, 'utf8');
+const adsLine = `google.com, pub-${numericId}, DIRECT, f08c47fec0942fa0\n`;
+const currentAds = fs.existsSync(ADS_TXT) ? fs.readFileSync(ADS_TXT, 'utf8') : '';
+if (currentAds !== adsLine) {
+  fs.writeFileSync(ADS_TXT, adsLine, 'utf8');
   console.log('✓ public/ads.txt 已写入授权声明');
 } else {
-  console.log('· ads.txt 已包含该发布商 ID，跳过');
+  console.log('· ads.txt 已是该发布商 ID，跳过');
 }
 
 // ---- 3. 可选：构建 + 部署 ----

@@ -1,3 +1,1 @@
-# ads.txt —— 申请 Google AdSense 后，把下面一行取消注释并替换为你的发布商 ID
-# 格式：google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
-# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-7888423026579133, DIRECT, f08c47fec0942fa0

@@ -17,27 +17,33 @@ const { slot = 'inArticle', label = '广告', height = 100, style = 'display:blo
 const client = site.ads.client;
 const slotId = site.ads.slots?.[slot] ?? '';
 const live = site.ads.enabled && client && slotId;
+// 未批准时不向线上输出占位块，避免审核员把页面当成未完成
+const showPlaceholder = !live && import.meta.env.DEV;
 ---
 
-<div class="adslot" style={`min-height:${height}px`}>
-  {
-    live ? (
-      <>
-        <div class="adslot__label">{label}</div>
-        <ins
-          class="adsbygoogle"
-          style={style}
-          data-ad-client={client}
-          data-ad-slot={slotId}
-          data-ad-format="auto"
-          data-full-width-responsive="true"
-        ></ins>
-        <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </>
-    ) : (
-      <div class="adslot__placeholder" style={`min-height:${height}px`}>
-        广告位 · {slot}（AdSense 批准后在此展示）
-      </div>
-    )
-  }
-</div>
+{
+  (live || showPlaceholder) && (
+    <div class="adslot" style={`min-height:${height}px`}>
+      {
+        live ? (
+          <>
+            <div class="adslot__label">{label}</div>
+            <ins
+              class="adsbygoogle"
+              style={style}
+              data-ad-client={client}
+              data-ad-slot={slotId}
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+            <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </>
+        ) : (
+          <div class="adslot__placeholder" style={`min-height:${height}px`}>
+            广告位 · {slot}（AdSense 批准后在此展示）
+          </div>
+        )
+      }
+    </div>
+  )
+}

@@ -10,3 +10,7 @@ dist/
 .vscode/
 coverage/
 .content-cache/
+
+# 本地工具目录：含部署元数据与操作记录，禁止提交
+.workbuddy/
+.wrangler/

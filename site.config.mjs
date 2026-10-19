@@ -62,17 +62,17 @@ export const site = {
 
   // ===== 广告变现 =====
   ads: {
-    enabled: false, // 拿到 AdSense 批准后改为 true
-    // AdSense 发布商 ID，形如 ca-pub-1234567890123456
-    client: '',
+    enabled: true,
+    // AdSense 发布商 ID
+    client: 'ca-pub-7888423026579133',
     slots: {
       header: '',
       inArticle: '',
       sidebar: '',
       footer: '',
     },
-    // 自动广告（Auto Ads）：批准后可开启，由 Google 自行选择位置
-    autoAds: false,
+    // 未创建广告单元时由这段脚本走自动广告，Google 自行选位置
+    autoAds: true,
   },
 
   // ===== 站点运营 =====
