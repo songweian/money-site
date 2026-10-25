@@ -1,9 +1,9 @@
 name: 每日内容自动生成
 
-# 每天北京时间 09:00 自动生成新文章并推送，Cloudflare Pages 会自动触发部署
+# 每天北京时间 20:00（UTC 12:00）生成一篇当前 AI 文章的中英版本并推送
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 12 * * *'
   workflow_dispatch:
     inputs:
       count:
@@ -59,7 +59,7 @@ jobs:
         run: |
           git config user.name "ai-bot"
           git config user.email "ai-bot@users.noreply.github.com"
-          git add src/content/posts
+          git add src/content/posts src/content/en
           git diff --cached --quiet || git commit -m "content: AI 自动生成内容 $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
 
